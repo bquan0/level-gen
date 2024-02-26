@@ -1,0 +1,23 @@
+{
+    "textures": [
+        {
+            "folder": "Bricks",
+            "jpg_dict": {
+                "albedo": "Bricks085_1K-JPG_Color.jpg",
+                "roughness": "Bricks085_1K-JPG_Roughness.jpg",
+                "normal": "Bricks085_1K-JPG_NormalGL.jpg",
+                "depth": "Bricks085_1K-JPG_Displacement.jpg"
+            },
+            "uv1_scale": "Vector3( 1.5, 2, 1 )"             
+        }, 
+        {
+            "folder": "Carpet",
+            "jpg_dict": {
+                "albedo": "Fabric027_1K-JPG_Color.jpg",
+                "roughness": "Fabric027_1K-JPG_Roughness.jpg",
+                "normal": "Fabric027_1K-JPG_NormalGL.jpg",
+                "depth": "Fabric027_1K-JPG_Displacement.jpg"
+            }
+        }
+    ]
+}
