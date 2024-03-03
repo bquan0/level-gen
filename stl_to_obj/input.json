@@ -2,7 +2,7 @@
     "header": {
         "output_folder": "TwoRoom3",
         "scale": 0.01,
-        "extra_textures": "input_textures.json"
+        "extra_textures": "extra_textures.json"
     },
     "meshes":[
         {

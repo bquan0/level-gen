@@ -18,6 +18,17 @@
                 "normal": "Fabric027_1K-JPG_NormalGL.jpg",
                 "depth": "Fabric027_1K-JPG_Displacement.jpg"
             }
+        },
+        {
+            "folder": "Metal",
+            "jpg_dict": {
+                "albedo": "Metal009_1K-JPG_Color.jpg",
+                "roughness": "Metal009_1K-JPG_Roughness.jpg",
+                "metallic": "Metal009_1K-JPG_Metalness.jpg",
+                "normal": "Metal009_1K-JPG_NormalGL.jpg",
+                "depth": "Metal009_1K-JPG_Displacement.jpg"
+            }
         }
+        
     ]
 }
