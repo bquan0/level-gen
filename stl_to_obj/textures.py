@@ -20,29 +20,29 @@ other_textures = dict()
 # add textures from a .json file to dict 
 # allows contributors to use their own textures (that we don't have)
 def load_textures(filename):
+    data = ""
     with open(filename, 'r') as f:
         # load JSON object as dictionary
         data = json.load(f)
 
-        textures = data["textures"]
-        
-        for texture_data in data["textures"]:
-            if 'uv_scale1' not in texture_data:
-                texture_data['uv_scale1'] = ""
-            texture_dict[texture_data['folder']] = Texture(texture_data['folder'],
-                                                           texture_data['jpg_dict'],
-                                                           texture_data['uv_scale1'])
+    textures = data["textures"]
+    
+    for texture_data in data["textures"]:
+        if 'uv_scale1' not in texture_data:
+            texture_data['uv_scale1'] = ""
+        texture_dict[texture_data['folder']] = Texture(texture_data['folder'],
+                                                        texture_data['jpg_dict'],
+                                                        texture_data['uv_scale1'])
 
-        # load in textures that don't require .jpgs
-        if "other_textures" in data:
-            for key in data["other_textures"]:
-                other_textures[key] = data["other_textures"][key]
+    # load in textures that don't require .jpgs
+    if "other_textures" in data:
+        for key in data["other_textures"]:
+            other_textures[key] = data["other_textures"][key]
 
 # debug printout to check if we load our provided textures correctly
 if __name__ == "__main__":
-    add_textures("textures.json")
+    load_textures("textures.json")
     for i in texture_dict:
         print(i)
-
     for i in other_textures:
         print(i)

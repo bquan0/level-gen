@@ -174,10 +174,10 @@ def main():
             os.mkdir(f"./{output_folder}")
 
         # load provided textures
-        Textures.add_textures("textures.json")
+        Textures.load_textures("textures.json")
         # (optional) load extra textures 
         if "extra_textures" in header: 
-            Textures.add_textures(header["extra_textures"])
+            Textures.load_textures(header["extra_textures"])
         
         # initialize root node
         nodes += f'[node name="{output_folder}" type="Spatial"]\n'
