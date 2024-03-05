@@ -22,15 +22,9 @@ with open(args.mcnpFile, 'r') as mcnpFile, open(output_filename, 'w') as outputF
         mcnpLine = mcnpFile.readline()
     # 1b. split line into all the boundaries, write to file with comma separation
     # do this 3 times for the 3 axes
-    for a in range(3):
-        boundariesArray = mcnpLine.split()
-        outputStr = ""
-        ba_length = len(boundariesArray)
-        for index, boundary in enumerate(boundariesArray):
-            if index >= 2 and index < ba_length-1:
-                outputStr += boundary + ","
-            elif index == ba_length-1:
-                outputStr += boundary + "\n"
+    num_dims = 3
+    for dim in range(num_dims):
+        outputStr = ','.join(mcnpLine.split().strip()) + '\n'
         outputFile.write(outputStr)
         mcnpLine = mcnpFile.readline()
 
@@ -42,15 +36,7 @@ with open(args.mcnpFile, 'r') as mcnpFile, open(output_filename, 'w') as outputF
     mcnpLine = mcnpFile.readline() # this will have the first centroid (x,y,z) and result
     # iterate through all voxels
     while mcnpLine:
-        voxelArray = mcnpLine.split()
-        outputStr = ""
-        va_length = len(voxelArray)
-        # write all data of a voxel with comma separation
-        for index, data in enumerate(voxelArray):
-            if index >= 1 and index < va_length-1:
-                outputStr += data + ","
-            elif index == va_length-1:
-                outputStr += data + "\n"
+        outputStr = ','.join(mcnpLine.split().strip()) + '\n'
         outputFile.write(outputStr)
         mcnpLine = mcnpFile.readline()
 
