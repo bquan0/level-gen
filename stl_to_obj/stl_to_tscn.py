@@ -104,8 +104,7 @@ def generate_texture(texture, ext_resource_id, sub_resource_id):
     # check if it's a PBR texture (require .jpgs)
     if texture in Textures.texture_dict:
         sub_res_addon += f'[sub_resource type="SpatialMaterial" id={sub_resource_id}]\n'
-        for jpg in Textures.texture_dict[texture].jpg_dict:
-            value = Textures.texture_dict[texture].jpg_dict[jpg]
+        for jpg, value in Textures.texture_dict[texture].jpg_dict.items():
             # form the ext_resource
             ext_res_addon += f'[ext_resource path="res://{Textures.TEXTURE_FOLDER}/{Textures.texture_dict[texture].folder}/{value}" type="Texture" id={ext_resource_id}]\n'
             # add to sub_res_addon
