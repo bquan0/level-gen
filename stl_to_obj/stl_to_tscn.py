@@ -48,7 +48,7 @@ class TscnGen:
                 t_info = Textures.texture_dict[texture]
                 self.sub_resource += f'[sub_resource type="SpatialMaterial" id={self.sub_resource_id}]\n'
 
-                for jpg, value in Textures.texture_dict[texture].jpg_dict.items():
+                for jpg, value in t_info.jpg_dict.items():
                     if jpg in ["albedo", "roughness", "metallic"]:
                         self.sub_resource += f"{jpg}_texture = ExtResource( {self.ext_resource_id} )\n"
                     elif jpg == "normal":
@@ -56,12 +56,12 @@ class TscnGen:
                     elif jpg == "depth":
                         self.sub_resource += Textures.DEPTH_OPTIONS + f"depth_texture = ExtResource( {self.ext_resource_id} )\n"
                     # add .jpg as ext_resource
-                    self.ext_resource += f'[ext_resource path="res://{Textures.TEXTURE_FOLDER}/{Textures.texture_dict[texture].folder}/{value}" type="Texture" id={self.ext_resource_id}]\n'
+                    self.ext_resource += f'[ext_resource path="res://{Textures.TEXTURE_FOLDER}/{t_info.folder}/{value}" type="Texture" id={self.ext_resource_id}]\n'
                     self.ext_resource_id += 1
 
                 # add uv1_scale if texture has it
-                if Textures.texture_dict[texture].uv1_scale:
-                    self.sub_resource += f"uv1_scale = {Textures.texture_dict[texture].uv1_scale}\n"
+                if t_info.uv1_scale:
+                    self.sub_resource += f"uv1_scale = {t_info.uv1_scale}\n"
 
             # handle textures which don't need .jpgs (only need sub_resource)
             elif texture in Textures.other_textures:

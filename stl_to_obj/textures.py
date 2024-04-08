@@ -1,4 +1,5 @@
 import json
+import copy
 
 # filenames of all the PBR textures included in game in the textures folder, stored as a dict for each file
 TEXTURE_FOLDER = "textures"
@@ -27,15 +28,14 @@ def load_textures(filename):
     textures = data["textures"]
     
     for texture_data in data["textures"]:
-        if 'uv1_scale' not in texture_data:
-            texture_data['uv1_scale'] = ""
         texture_dict[texture_data['folder']] = Texture(texture_data['folder'],
                                                         texture_data['jpg_dict'],
                                                         texture_data.get('uv1_scale', ""))
 
     # load in textures that don't require .jpgs
     if "other_textures" in data:
-        other_textures = data["other_textures"]
+        for key in data["other_textures"]:
+            other_textures[key] = data["other_textures"][key]
 
 # debug printout to check if we load our provided textures correctly
 if __name__ == "__main__":
