@@ -45,6 +45,7 @@ class TscnGen:
         if texture not in self.texture_index:
             # handle PBR textures (require .jpgs)
             if texture in Textures.texture_dict:
+                t_info = Textures.texture_dict[texture]
                 self.sub_resource += f'[sub_resource type="SpatialMaterial" id={self.sub_resource_id}]\n'
 
                 for jpg, value in Textures.texture_dict[texture].jpg_dict.items():
@@ -132,7 +133,7 @@ class TscnGen:
         bpy.ops.import_scene.fbx(filepath = fbx_file)
 
         # rename all objects as -colonly
-        for obj_index, _ in enumerate(bpy.data.objects):
+        for obj_index in range(len(bpy.data.objects)):
             # every re-name moves the object to the back of the list. 
             bpy.data.objects[0].name = "Volume" + str(obj_index) + "-colonly"
 

@@ -31,12 +31,11 @@ def load_textures(filename):
             texture_data['uv1_scale'] = ""
         texture_dict[texture_data['folder']] = Texture(texture_data['folder'],
                                                         texture_data['jpg_dict'],
-                                                        texture_data['uv1_scale'])
+                                                        texture_data.get('uv1_scale', ""))
 
     # load in textures that don't require .jpgs
     if "other_textures" in data:
-        for key in data["other_textures"]:
-            other_textures[key] = data["other_textures"][key]
+        other_textures = data["other_textures"]
 
 # debug printout to check if we load our provided textures correctly
 if __name__ == "__main__":
