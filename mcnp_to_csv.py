@@ -1,12 +1,12 @@
 # 1. generate array of boundaries for x, y, and z
 # 2. generate array of centroid (x,y,z), result, relative error
 import argparse
-import os
+from pathlib import Path, PurePath
 
 def mcnp_to_csv(mcnpFile, outputFile):
     # append output filename with .csv regardless of what its file extension is
-    output_filename, _ = os.path.splitext(outputFile)
-    output_filename += ".csv"
+    outputPath = PurePath(outputFile)
+    output_filename = f"{outputPath.stem}.csv"
 
     # open files
     with open(mcnpFile, 'r') as mcnpFile, open(output_filename, 'w') as outputFile:

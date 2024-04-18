@@ -1,12 +1,13 @@
 import argparse
-import os
+from pathlib import Path
 import json
 import shutil
+import warnings
 
 import aspose.threed as a3d
 import bpy
 
-import textures as Textures # custom module created to store texture info
+import textures # custom module created to store texture info
 
 # example run
 # python3.10 stl_to_tscn.py input.json
@@ -20,8 +21,50 @@ UV_MAPS = {
     "unwrap": bpy.ops.uv.unwrap
 }
 
-class TscnGen:    
+class TscnGenerator:    
+    """ Class to generate the ext_resource, sub_resource, and node sections of scene files
+    
+    Attributes
+    ----------
+    input_folder : str
+        location of the .stl files
+    output_folder : str
+        where output .obj, .glb, and .tscn files should be placed
+    ext_resource : str
+        stores the references to .jpg, .obj, .glb files that the scene uses
+    ext_resource_id : int
+        index of the next ext_resource to be added
+    sub_resource : str
+        constructions of SpatialMaterials (textures)
+    sub_resource_id : int
+        index of the next sub_resource to be added
+    nodes : str
+        MeshInstances and collisions scenes
+    texture_index : dict
+        stores the sub_resource_id of generated textures
+
+    Methods
+    -------
+    add_texture(texture):
+        Adds a texture to sub_resource and stores its index in texture_index
+    add_obj_file(stl_file_extless, uv_map, mesh_compression, texture):
+        Generates an .obj from an .stl and applies a texture to the .obj 
+    add_collisions(stl_file_extless):
+        Generates a .glb collision scene file from an .stl
+    write_tscn_file():
+        Creates the .tscn file and writes ext_resource, sub_resource, and node to it.
+    """
     def __init__(self, input_folder, output_folder, scale):
+        """
+        Parameters
+        ----------
+        input_folder : str
+            location of the .stl files
+        output_folder : str
+            where output .obj, .glb, and .tscn files should be placed
+        scale : float
+            the scale of the models (ex: if the model was in centimeters, scale = 0.01)
+        """
         self.input_folder = input_folder
         self.output_folder = output_folder
 
@@ -43,22 +86,30 @@ class TscnGen:
         self.texture_index = dict()
 
     def add_texture(self, texture):
+        """
+        Adds a texture to sub_resource and stores its index in texture_index.
+        
+        Parameters
+        ----------
+        texture : str
+            name of a texture that can be found in the dictionary of the textures module. 
+        """
         # don't generate textures more than once
         if texture not in self.texture_index:
             # handle PBR textures (require .jpgs)
-            if texture in Textures.texture_dict:
-                t_info = Textures.texture_dict[texture]
+            if texture in textures.texture_dict:
+                t_info = textures.texture_dict[texture]
                 self.sub_resource += f'[sub_resource type="SpatialMaterial" id={self.sub_resource_id}]\n'
 
                 for jpg, value in t_info.jpg_dict.items():
                     if jpg in ["albedo", "roughness", "metallic"]:
                         self.sub_resource += f"{jpg}_texture = ExtResource( {self.ext_resource_id} )\n"
                     elif jpg == "normal":
-                        self.sub_resource += Textures.NORMAL_OPTIONS + f"normal_texture = ExtResource( {self.ext_resource_id} )\n"
+                        self.sub_resource += textures.NORMAL_OPTIONS + f"normal_texture = ExtResource( {self.ext_resource_id} )\n"
                     elif jpg == "depth":
-                        self.sub_resource += Textures.DEPTH_OPTIONS + f"depth_texture = ExtResource( {self.ext_resource_id} )\n"
+                        self.sub_resource += textures.DEPTH_OPTIONS + f"depth_texture = ExtResource( {self.ext_resource_id} )\n"
                     # add .jpg as ext_resource
-                    self.ext_resource += f'[ext_resource path="res://{Textures.TEXTURE_FOLDER}/{t_info.folder}/{value}" type="Texture" id={self.ext_resource_id}]\n'
+                    self.ext_resource += f'[ext_resource path="res://{textures.TEXTURE_FOLDER}/{t_info.folder}/{value}" type="Texture" id={self.ext_resource_id}]\n'
                     self.ext_resource_id += 1
 
                 # add uv1_scale if texture has it
@@ -66,8 +117,8 @@ class TscnGen:
                     self.sub_resource += f"uv1_scale = {t_info.uv1_scale}\n"
 
             # handle textures which don't need .jpgs (only need sub_resource)
-            elif texture in Textures.other_textures:
-                self.sub_resource += f'[sub_resource type="SpatialMaterial" id={self.sub_resource_id}]\n{Textures.other_textures[texture]}'
+            elif texture in textures.other_textures:
+                self.sub_resource += f'[sub_resource type="SpatialMaterial" id={self.sub_resource_id}]\n{textures.other_textures[texture]}'
 
             self.sub_resource += "\n"
                 
@@ -76,6 +127,20 @@ class TscnGen:
             self.sub_resource_id += 1 
 
     def add_obj_file(self, stl_file_extless, uv_map, mesh_compression, texture):
+        """
+        Generates an .obj from an .stl and applies a texture to the .obj 
+
+        Parameters
+        ----------
+        stl_file_extless : str
+            name of the .stl file without the extension
+        uv_map : str
+            type of texture mapping to apply to the mesh
+        mesh_compression : str
+            how to combine the triangles of the .stl file
+        texture : str
+            texture to apply to this .stl file 
+        """
         # reset bpy
         bpy.ops.wm.read_factory_settings(use_empty=True)
         # import .stl into bpy
@@ -128,15 +193,24 @@ class TscnGen:
         self.ext_resource_id += 1
 
     def add_collisions(self, stl_file_extless):
+        """
+        Generates a .glb collision scene file from an .stl
+
+        Parameters
+        ----------
+        stl_file_extless : str
+            name of the .stl file without the extension
+        """
         # generate fbx file from stl file to create collisions
-        fbx_file = f"{self.output_folder}/{stl_file_extless}.fbx"
-        scene = a3d.Scene.from_file(f"{self.input_folder}/{stl_file_extless}.stl")
-        scene.save(fbx_file)
+        stl_file = Path(self.input_folder) / Path(stl_file_extless).with_suffix('.stl')
+        fbx_file = Path(self.output_folder) / Path(stl_file_extless).with_suffix('.fbx')
+        scene = a3d.Scene.from_file(str(stl_file))
+        scene.save(str(fbx_file))
 
         # reset bpy
         bpy.ops.wm.read_factory_settings(use_empty=True)
         # import .fbx into bpy
-        bpy.ops.import_scene.fbx(filepath = fbx_file)
+        bpy.ops.import_scene.fbx(filepath = str(fbx_file))
 
         # rename all objects as -colonly
         for obj_index in range(len(bpy.data.objects)):
@@ -147,7 +221,7 @@ class TscnGen:
         bpy.ops.export_scene.gltf(filepath = f"{self.output_folder}/{stl_file_extless}.gltf")
 
         # remove the fbx file
-        os.remove(fbx_file)
+        Path.unlink(fbx_file)
 
         # add to tscn file  
         self.nodes += f'[node name="{stl_file_extless}Col" parent="." instance=ExtResource( {self.ext_resource_id} )]\n\n'
@@ -155,18 +229,20 @@ class TscnGen:
         self.ext_resource_id += 1
 
     def write_tscn_file(self):
+        """ Creates the .tscn file and writes ext_resource, sub_resource, and node to it. """
         with open(f"{self.output_folder}/{self.output_folder}.tscn", 'w') as tscn_file:
             tscn_file.write(f"[gd_scene load_steps={self.ext_resource_id + self.sub_resource_id} format=2]\n\n{self.ext_resource}\n{self.sub_resource}{self.nodes}")
 
 
 def make_folder(folder):
     try:
-        os.mkdir(f"./{folder}")
+        p = Path.cwd() / Path(folder)
+        p.mkdir()
     # delete the folder and remake it if it does exist
-    except OSError as error:
-        print(f"NOTICE: {folder} folder already exists, so it was deleted and remade")
-        shutil.rmtree(folder) # delete folder and contents
-        os.mkdir(f"./{folder}")
+    except FileExistsError:
+        warnings.warn(f"{folder} folder already exists, so it was deleted and remade", UserWarning)
+        shutil.rmtree(p) # delete folder and contents
+        p.mkdir()
 
 
 def main():
@@ -184,9 +260,9 @@ def main():
     output_folder = header["output_folder"]
 
     # load textures
-    Textures.load_textures("textures.json")
+    textures.load_textures("textures.json")
     if "extra_textures" in header: 
-        Textures.load_textures(header["extra_textures"])
+        textures.load_textures(header["extra_textures"])
         
     # make the output folder
     make_folder(output_folder)
@@ -195,13 +271,13 @@ def main():
     scale = 1
     if "scale" in header:
         scale = header["scale"]
-    tscn = TscnGen(input_folder, output_folder, scale)
+    tscn = TscnGenerator(input_folder, output_folder, scale)
 
     ##################################
     # iterate through all .stl files #
     ##################################
     for m in data["meshes"]:
-        stl_file_extless, _ = os.path.splitext(m["stl_file"])
+        stl_file_extless = Path(m["stl_file"]).stem
         # generation
         tscn.add_texture(m["texture"])
         tscn.add_obj_file(stl_file_extless, m["uv_map"], m["mesh_compression"], m["texture"])

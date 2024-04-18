@@ -8,7 +8,28 @@ NORMAL_OPTIONS = "normal_enabled = true\nnormal_scale = -1.0\n"
 DEPTH_OPTIONS = "depth_enabled = true\ndepth_scale = -0.01\ndepth_deep_parallax = false\ndepth_flip_tangent = false\ndepth_flip_binormal = false\n"
 
 class Texture:
+    """ Groups together strings relevant to texture generation in .tscn files.
+    
+    Attributes
+    ----------
+    folder : str
+        name of folder that stores the .jpgs of the texture
+    jpg_dict : dict
+        stores the filename of each .jpg file
+    uv1_scale : str
+        represents the stretching/compression of a texture
+    """
     def __init__(self, folder, jpg_dict, uv1_scale = ""):
+        """
+        Parameters
+        ----------
+        folder : str
+            name of folder that stores the .jpgs of the texture
+        jpg_dict : dict
+            stores the filename of each .jpg file
+        uv1_scale : str
+            represents the stretching/compression of a texture (default is None)
+        """
         self.folder = folder
         self.jpg_dict = jpg_dict
         # uv shouldn't be in the dict because it doesn't need an ext_resource like the .jpgs
@@ -34,8 +55,8 @@ def load_textures(filename):
 
     # load in textures that don't require .jpgs
     if "other_textures" in data:
-        for key in data["other_textures"]:
-            other_textures[key] = data["other_textures"][key]
+        for name, texture in data["other_textures"].items():
+            other_textures[name] = texture
 
 # debug printout to check if we load our provided textures correctly
 if __name__ == "__main__":
