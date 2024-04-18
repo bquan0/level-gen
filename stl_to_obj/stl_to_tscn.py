@@ -170,8 +170,9 @@ class TscnGenerator:
             # Call project operator to generate uv maps
             try:
                 UV_MAPS[uv_map]()
-            except KeyError as e:
-                print(f"no uv map generated for {stl_file_extless} due to invalid uv_map")
+            except KeyError:
+                e = KeyError(f"no uv map generated for {stl_file_extless} due to invalid uv_map")
+                raise e
 
             # Toggle out of Edit Mode
             bpy.ops.object.mode_set(mode='OBJECT')
