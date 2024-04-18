@@ -1,9 +1,11 @@
-import aspose.threed as a3d
 import argparse
 import os
-import bpy
 import json
 import shutil
+
+import aspose.threed as a3d
+import bpy
+
 import textures as Textures # custom module created to store texture info
 
 # example run
@@ -77,7 +79,8 @@ class TscnGen:
         # reset bpy
         bpy.ops.wm.read_factory_settings(use_empty=True)
         # import .stl into bpy
-        bpy.ops.import_mesh.stl(filepath = f"{self.input_folder}/{stl_file_extless}.stl")
+        import_path = Path(self.input_folder) / Path(stl_file_extless).with_suffix('.stl')
+        bpy.ops.import_mesh.stl(filepath=str(import_path))
         # Get all objects in selection
         selection = bpy.context.selected_objects
         # Deselect all objects
@@ -111,9 +114,12 @@ class TscnGen:
             obj.select_set(False)
 
         # Export to obj
-        bpy.ops.wm.obj_export(filepath = f"{self.output_folder}/{stl_file_extless}.obj")
+        export_path = Path(self.output_folder) / Path(stl_file_extless).with_suffix('.obj')
+        bpy.ops.wm.obj_export(filepath = str(export_path))
+        
         # remove the .mtl file
-        os.remove(f"{self.output_folder}/{stl_file_extless}.mtl")
+        mtl_filepath = Path(self.output_folder) / Path(stl_file_extless).with_suffix('.mtl')
+        Path.unlink(mtl_filepath)
 
         # add to tscn file
         self.nodes += f'[node name="{stl_file_extless}" type="MeshInstance" parent="."]\nmesh = ExtResource( {self.ext_resource_id} )' \

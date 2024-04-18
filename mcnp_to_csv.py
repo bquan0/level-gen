@@ -17,8 +17,8 @@ def mcnp_to_csv(mcnpFile, outputFile):
             mcnpLine = mcnpFile.readline()
         # 1b. split line into all the boundaries, write to file with comma separation
         # do this 3 times for the 3 axes
-        num_dims = 3
-        for dim in range(num_dims):
+        dims = ['x', 'y', 'z']
+        for dim in dims:
             outputStr = ','.join(mcnpLine.strip().split()[2:]) + '\n'
             outputFile.write(outputStr)
             mcnpLine = mcnpFile.readline()
