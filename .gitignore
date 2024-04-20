@@ -1,0 +1,15 @@
+# large input files
+*.SAT
+*.sat
+*.txt
+*.stl
+*.STEP
+
+# large output files
+*.tscn
+*.obj
+*.glb
+*.csv
+
+# python ignores
+__pycache__

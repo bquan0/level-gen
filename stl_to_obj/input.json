@@ -1,0 +1,45 @@
+{
+    "header": {
+        "input_folder": ".",
+        "output_folder": "TwoRoom2",
+        "scale": 0.01,
+        "extra_textures": "more_textures.json"
+    },
+    "meshes":[
+        {
+            "stl_file": "walls.stl",
+            "uv_map": "cube",
+            "texture": "Plaster", 
+            "collisions": true,
+            "mesh_compression": "limited_dissolve"
+        },
+        {
+            "stl_file": "ceiling.stl",
+            "uv_map": "cube",
+            "texture": "CeilingTile", 
+            "collisions": true,
+            "mesh_compression": "limited_dissolve"
+        },
+        {
+            "stl_file": "floor.stl",
+            "uv_map": "cube",
+            "texture": "TiledFloor", 
+            "collisions": true,
+            "mesh_compression": "limited_dissolve"
+        },
+        {
+            "stl_file": "highefficiencyshield.stl",
+            "uv_map": "cube",
+            "texture": "glass", 
+            "collisions": true,
+            "mesh_compression": "limited_dissolve"
+        },
+        {
+            "stl_file": "radioactivecylinder.stl",
+            "uv_map": "cube",
+            "texture": "radioactive", 
+            "collisions": true,
+            "mesh_compression": "limited_dissolve"
+        }
+    ]
+}
