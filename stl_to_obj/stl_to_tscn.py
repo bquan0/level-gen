@@ -214,9 +214,9 @@ class TscnGenerator:
         bpy.ops.import_scene.fbx(filepath = str(fbx_file))
 
         # rename all objects as -colonly
-        for obj_index in range(len(bpy.data.objects)):
+        for obj_index, obj in enumerate(bpy.data.objects):
             # every re-name moves the object to the back of the list. 
-            bpy.data.objects[0].name = "Volume" + str(obj_index) + "-colonly"
+            obj.name = "Volume" + str(obj_index) + "-colonly"
 
         # export to .gltf
         bpy.ops.export_scene.gltf(filepath = f"{self.output_folder}/{stl_file_extless}.gltf")
