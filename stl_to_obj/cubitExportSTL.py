@@ -73,15 +73,14 @@ def export_groups(output_folder, template='.csv'):
             json_file.write(json_string)
     # default is .csv file
     else:
-        # write the header dict
         with open(Path(output_folder) / Path("input").with_suffix('.csv'), 'w', newline='',) as csv_file:
+            # write the header dict
             fieldnames = ["input_folder", "output_folder", "scale", "extra_textures"]
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerow(header_dict)
 
-        # write the meshes array
-        with open(Path(output_folder) / Path("input").with_suffix('.csv'), 'a', newline='') as csv_file:
+            # write the meshes array
             fieldnames = ["stl_file", "uv_map", "texture", "collisions", "mesh_compression"]
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
@@ -92,14 +91,10 @@ def main():
     parser = argparse.ArgumentParser(prog = "export groups in ACIS file to .stl files")
     parser.add_argument("output_folder", type = str, help = "location to store .stl and template files")
     parser.add_argument("sat_file", type = str, help = "location of ACIS file")
-    parser.add_argument("--template", "-t", type = str, help = "type of output template file (.json or .csv)")
+    parser.add_argument("--template", "-t", type = str, default=".csv", help = "type of output template file (.json or .csv)")
     args = parser.parse_args()
 
-    if args.template:
-        export_groups_CL(args.output_folder, args.sat_file, args.template)
-    else:
-        export_groups_CL(args.output_folder, args.sat_file)
-
+    export_groups_CL(args.output_folder, args.sat_file, args.template)
 
 if __name__ == "__main__":
     main()
