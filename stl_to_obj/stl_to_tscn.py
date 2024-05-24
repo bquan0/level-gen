@@ -267,7 +267,7 @@ def csvToDict(csv_filepath):
         meshes = []
         reader = csv.DictReader(StringIO(meshes_string))
         for row in reader:
-            if row["collisions"].casefold() == "true".casefold():
+            if row["collisions"].casefold() == "true":
                 row["collisions"] = True
             else:
                 row["collisions"] = False
