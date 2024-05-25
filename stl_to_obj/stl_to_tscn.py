@@ -1,6 +1,8 @@
-import argparse
 from pathlib import Path
+from io import StringIO
+import argparse
 import json
+import csv
 import shutil
 import warnings
 
@@ -245,16 +247,48 @@ def make_folder(folder):
         shutil.rmtree(p) # delete folder and contents
         p.mkdir()
 
+def csvToDict(csv_filepath):
+    with open(csv_filepath) as csv_file:
+        # split csv_file into two strings
+        # header is the first 2 lines, meshes is the rest.
+        csv_list = list(csv_file)
+        header_string = f'{csv_list[0]}\n{csv_list[1]}'
+        csv_list.pop(0)
+        csv_list.pop(0)
+        meshes_string = '\n'.join(csv_list)
+
+        # create header dict
+        reader = csv.DictReader(StringIO(header_string))
+        for row in reader:
+            row["scale"] = float(row["scale"])
+            header = row # there should only be one row in reader, that's why this works
+
+        # create meshes array
+        meshes = []
+        reader = csv.DictReader(StringIO(meshes_string))
+        for row in reader:
+            if row["collisions"].casefold() == "true":
+                row["collisions"] = True
+            else:
+                row["collisions"] = False
+            meshes.append(row)
+        
+    return {"header": header, "meshes": meshes}
 
 def main():
-    # argparse to take in input.txt
     parser = argparse.ArgumentParser(prog = ".stl to .obj and .tscn file converter")
-    parser.add_argument("input_file", type = str, help = "input json filename")
+    parser.add_argument("input_file", type = str, help = "input filename (.json or .csv)")
     args = parser.parse_args()
 
-    # load input json dictionary
-    with open(args.input_file, 'r') as f:
-        data = json.load(f)
+    # load data dictionary differently based on whether it is .json or .csv
+    inputSuffix = Path(args.input_file).suffix
+    if inputSuffix == ".json":
+        with open(args.input_file, 'r') as f:
+            data = json.load(f)
+    elif inputSuffix == ".csv":
+        data = csvToDict(args.input_file)
+    else:
+        raise Exception("input file was not a .json or .csv file")
 
     header = data["header"]
     input_folder = header["input_folder"]
